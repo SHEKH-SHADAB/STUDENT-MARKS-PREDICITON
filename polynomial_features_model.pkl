@@ -1,0 +1,27 @@
+import pandas as pd
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+import pickle
+
+# Load your dataset
+file_path = "Student_Marks.csv"  # Replace with the path to your dataset
+data = pd.read_csv(file_path)
+
+# Prepare input features (X) and target variable (y)
+X = data[['number_courses', 'time_study']]
+y = data['marks']
+
+# Create a pipeline with Polynomial Features and Linear Regression
+polynomial_degree = 2  # Adjust the polynomial degree if necessary
+polynomial_model = make_pipeline(PolynomialFeatures(degree=polynomial_degree), LinearRegression())
+
+# Train the model
+polynomial_model.fit(X, y)
+
+# Save the trained model as a .pkl file
+model_path = "polynomial_features_model.pkl"  # This saves in the current working directory
+with open(model_path, "wb") as model_file:
+    pickle.dump(polynomial_model, model_file)
+
+print(f"Model saved successfully as {model_path}")
