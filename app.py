@@ -5,8 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the trained model
-with open("ols_model.pkl", "rb") as file:
-    model = pickle.load(file)
+try:
+    with open("ols_model.pkl", "rb") as file:
+        model = pickle.load(file)
+except FileNotFoundError:
+    st.error("Model file 'ols_model.pkl' not found. Please upload the file.")
+    st.stop()
 
 # Set page configuration
 st.set_page_config(page_title="Marks Prediction App", layout="centered", initial_sidebar_state="expanded")
@@ -49,23 +53,26 @@ time_study = st.sidebar.number_input("Time Studied (in hours)", min_value=0.0, m
 
 # Predict button
 if st.sidebar.button("Predict Marks"):
-    # Create input data for the model
-    input_data = pd.DataFrame({'number_courses': [number_courses], 'time_study': [time_study]})
-    
-    # Predict using the model
-    prediction = model.predict(input_data).item()
-    
-    # Display the result
-    st.markdown(f"<div class='prediction-result'>🎓 Predicted Marks: <b>{prediction:.2f}</b></div>", unsafe_allow_html=True)
-    
-    # Visualization
-    st.subheader("Prediction Visualization")
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.bar(["Predicted Marks"], [prediction], color="#4CAF50", alpha=0.8)
-    ax.set_ylabel("Marks")
-    ax.set_title("Predicted Marks Visualization")
-    ax.set_ylim(0, 100)
-    st.pyplot(fig)
+    try:
+        # Create input data for the model
+        input_data = pd.DataFrame({'number_courses': [number_courses], 'time_study': [time_study]})
+        
+        # Predict using the model
+        prediction = model.predict(input_data).item()
+        
+        # Display the result
+        st.markdown(f"<div class='prediction-result'>🎓 Predicted Marks: <b>{prediction:.2f}</b></div>", unsafe_allow_html=True)
+        
+        # Visualization
+        st.subheader("Prediction Visualization")
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.bar(["Predicted Marks"], [prediction], color="#4CAF50", alpha=0.8)
+        ax.set_ylabel("Marks")
+        ax.set_title("Predicted Marks Visualization")
+        ax.set_ylim(0, 100)
+        st.pyplot(fig)
+    except Exception as e:
+        st.error(f"An error occurred during prediction: {str(e)}")
 
 # Footer
 st.markdown("<div class='footer'>Created with ❤ using Streamlit</div>", unsafe_allow_html=True)
